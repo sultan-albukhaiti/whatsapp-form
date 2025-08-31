@@ -1,104 +1,60 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <title>تسجيل البيانات</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .container {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      width: 350px;
-    }
-    h2 {
-      text-align: center;
-      color: #333;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 10px;
-      background: #28a745;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #218838;
-    }
+    body { font-family: Arial, sans-serif; background:#f8f9fa; padding:20px; }
+    form { background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); max-width:400px; margin:auto; }
+    label { display:block; margin:10px 0 5px; }
+    input, select, button { width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px; }
+    button { background:#28a745; color:#fff; border:none; cursor:pointer; }
+    button:hover { background:#218838; }
   </style>
 </head>
-<body dir="rtl">
-  <div class="container">
-    <h2>تسجيل البيانات</h2>
-    <form id="dataForm">
-      <label>الاسم:</label>
-      <input type="text" name="name" required>
+<body>
+  <h2 style="text-align:center;">📋 تسجيل البيانات</h2>
+  <form id="myForm">
+    <label>الاسم:</label>
+    <input type="text" name="name" required>
+    
+    <label>رقم الهاتف:</label>
+    <input type="tel" name="phone" required>
 
-      <label>رقم الهاتف:</label>
-      <input type="text" name="phone" required>
+    <label>الدولة:</label>
+    <select name="country" required>
+      <option value="الكويت" selected>🇰🇼 الكويت</option>
+      <option value="السعودية">🇸🇦 السعودية</option>
+      <option value="الامارات">🇦🇪 الامارات</option>
+      <option value="قطر">🇶🇦 قطر</option>
+      <option value="البحرين">🇧🇭 البحرين</option>
+      <option value="العراق">🇮🇶 العراق</option>
+      <option value="اليمن">🇾🇪 اليمن</option>
+    </select>
 
-      <label>الدولة:</label>
-      <select name="country" required>
-        <option value="الكويت" selected>🇰🇼 الكويت</option>
-        <option value="السعودية">🇸🇦 السعودية</option>
-        <option value="الإمارات">🇦🇪 الإمارات</option>
-        <option value="قطر">🇶🇦 قطر</option>
-        <option value="البحرين">🇧🇭 البحرين</option>
-        <option value="العراق">🇮🇶 العراق</option>
-        <option value="اليمن">🇾🇪 اليمن</option>
-      </select>
-
-      <button type="submit">إرسال</button>
-    </form>
-  </div>
+    <button type="submit">إرسال</button>
+  </form>
 
   <script>
-    document.getElementById("dataForm").addEventListener("submit", function(e){
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWuYXcTpEkgtotI3A8RbZ9HhkS7eYPxRaq2hrWTvjB8uh54ARl4FBPTK9hJtdPNs-b/exec";
+    const WHATSAPP_NUMBER = "96569646944";
+
+    document.getElementById("myForm").addEventListener("submit", e => {
       e.preventDefault();
+      let formData = new FormData(e.target);
 
-      const form = e.target;
-      const data = new FormData(form);
-
-      fetch("https://script.google.com/macros/s/AKfycbxWuYXcTpEkgtotI3A8RbZ9HhkS7eYPxRaq2hrWTvjB8uh54ARl4FBPTK9hJtdPNs-b/exec", {
-        method: "POST",
-        body: data
-      })
-      .then(res => res.text())
-      .then(response => {
-        alert("✅ تم حفظ البيانات بنجاح!");
-
-        // فتح واتساب بعد التسجيل
-        let phone = data.get("phone");
-        let name = data.get("name");
-        let country = data.get("country");
-        let msg = `مرحباً، اسمي ${name} من ${country}. رقمي: ${phone}`;
-        window.location.href = `https://wa.me/96569646944?text=${encodeURIComponent(msg)}`;
-      })
-      .catch(err => alert("حدث خطأ: " + err));
+      fetch(SCRIPT_URL, { method: "POST", body: formData })
+        .then(response => {
+          let name = formData.get("name");
+          let phone = formData.get("phone");
+          let country = formData.get("country");
+          
+          let message = `الاسم: ${name}%0Aالرقم: ${phone}%0Aالدولة: ${country}`;
+          let whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+          
+          window.open(whatsappURL, "_blank");
+        })
+        .catch(err => alert("حصل خطأ، حاول لاحقاً"));
     });
   </script>
 </body>
