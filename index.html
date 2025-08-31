@@ -4,57 +4,105 @@
   <meta charset="UTF-8">
   <title>تسجيل البيانات</title>
   <style>
-    body { font-family: Arial, sans-serif; background:#f8f9fa; padding:20px; }
-    form { background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); max-width:400px; margin:auto; }
-    label { display:block; margin:10px 0 5px; }
-    input, select, button { width:100%; padding:10px; margin-bottom:15px; border:1px solid #ccc; border-radius:5px; }
-    button { background:#28a745; color:#fff; border:none; cursor:pointer; }
-    button:hover { background:#218838; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 360px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 16px;
+      background: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #218838;
+    }
   </style>
 </head>
 <body>
-  <h2 style="text-align:center;">📋 تسجيل البيانات</h2>
-  <form id="myForm">
-    <label>الاسم:</label>
-    <input type="text" name="name" required>
-    
-    <label>رقم الهاتف:</label>
-    <input type="tel" name="phone" required>
+  <div class="container">
+    <h2>تسجيل البيانات</h2>
+    <form id="dataForm">
+      <label>الاسم:</label>
+      <input type="text" name="name" required>
 
-    <label>الدولة:</label>
-    <select name="country" required>
-      <option value="الكويت" selected>🇰🇼 الكويت</option>
-      <option value="السعودية">🇸🇦 السعودية</option>
-      <option value="الامارات">🇦🇪 الامارات</option>
-      <option value="قطر">🇶🇦 قطر</option>
-      <option value="البحرين">🇧🇭 البحرين</option>
-      <option value="العراق">🇮🇶 العراق</option>
-      <option value="اليمن">🇾🇪 اليمن</option>
-    </select>
+      <label>رقم الهاتف:</label>
+      <input type="tel" name="phone" required>
 
-    <button type="submit">إرسال</button>
-  </form>
+      <label>الدولة:</label>
+      <select name="country" required>
+        <option value="الكويت" selected>🇰🇼 الكويت</option>
+        <option value="السعودية">🇸🇦 السعودية</option>
+        <option value="الإمارات">🇦🇪 الإمارات</option>
+        <option value="قطر">🇶🇦 قطر</option>
+        <option value="البحرين">🇧🇭 البحرين</option>
+        <option value="العراق">🇮🇶 العراق</option>
+        <option value="اليمن">🇾🇪 اليمن</option>
+      </select>
+
+      <label>ملاحظة:</label>
+      <textarea name="note" rows="3" placeholder="أدخل ملاحظتك هنا..."></textarea>
+
+      <button type="submit">إرسال</button>
+    </form>
+  </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxWuYXcTpEkgtotI3A8RbZ9HhkS7eYPxRaq2hrWTvjB8uh54ARl4FBPTK9hJtdPNs-b/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxUyCDX3ID4r9-pCkF7k5B8_ShLtlMKdrR2FzMvmSOTygiohlk2o2slY76d91a17_u1/exec";
     const WHATSAPP_NUMBER = "96569646944";
 
-    document.getElementById("myForm").addEventListener("submit", e => {
+    document.getElementById("dataForm").addEventListener("submit", e => {
       e.preventDefault();
-      let formData = new FormData(e.target);
+      const formData = new FormData(e.target);
 
-      fetch(SCRIPT_URL, { method: "POST", body: formData })
-        .then(response => {
-          let name = formData.get("name");
-          let phone = formData.get("phone");
-          let country = formData.get("country");
-          
-          let message = `الاسم: ${name}%0Aالرقم: ${phone}%0Aالدولة: ${country}`;
-          let whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
-          
-          window.open(whatsappURL, "_blank");
-        })
-        .catch(err => alert("حصل خطأ، حاول لاحقاً"));
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        body: formData
+      })
+      .then(resp => resp.json())
+      .then(json => {
+        if (json.result === "success") {
+          alert("تم حفظ البيانات بنجاح!");
+          const name = formData.get("name");
+          const phone = formData.get("phone");
+          const country = formData.get("country");
+          const note = formData.get("note");
+          const message = `الاسم: ${name}%0Aالرقم: ${phone}%0Aالدولة: ${country}%0Aالملاحظة: ${note}`;
+          window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, "_blank");
+        } else {
+          alert("حصل خطأ أثناء الحفظ: " + json.error);
+        }
+      })
+      .catch(err => alert("خطأ في الاتصال، حاول لاحقاً"));
     });
   </script>
 </body>
